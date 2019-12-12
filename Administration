@@ -1,0 +1,15 @@
+Changing Passwords:
+
+[rabbitmqctl  change_password  Username  'Newpassword']
+
+rabbitmqctl  change_password rmqmaster 'StrongPassword'
+
+
+Remove de cluster:
+
+	rabbitmqctl stop_app
+	rabbitmqctl reset
+	rabbitmqctl start_app
+	rabbitmqctl cluster_status
+	
+
