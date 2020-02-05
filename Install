@@ -48,7 +48,7 @@ Error: (ajouter le dépôt manuellement)
 	rabbitmqctl set_user_tags admin administrator
 	
 	
-Test: http://10.129.149.218:15672
+Test: http://IP:15672
 
 
 Cluster:
