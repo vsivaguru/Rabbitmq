@@ -54,9 +54,9 @@ Test: http://10.129.149.218:15672
 Cluster:
 
 Server	Hostname	IP Address
-MQ Server 1	clasyn-ea04-rmq.adm.fr.clara.net	10.129.149.203
-MQ Server 2	clasyn-ea05-rmq.adm.fr.clara.net	10.129.149.244
-MQ Server 3	clasyn-ea06-rmq.adm.fr.clara.net	10.129.149.218
+MQ Server 1	rabbit-ea04-rmq.	10.XXX
+MQ Server 2	rabbit-ea05-rmq.	10.XXX
+MQ Server 3	rabbit-ea06-rmq.	10.XXX
 
 
 sudo scp /var/lib/rabbitmq/.erlang.cookie clasyn-ea05-rmq:/var/lib/rabbitmq/.erlang.cookie
