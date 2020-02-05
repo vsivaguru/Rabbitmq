@@ -48,9 +48,16 @@ Error: (ajouter le dépôt manuellement)
 	rabbitmqctl set_user_tags admin administrator
 	
 	
-Test: http://IP:15672
+check: http://IP:15672
 
-
+Join cluster (lancer ce commande depuis le slave):
+	#srv02: sudo rabbitmqctl join_cluster rmqmaster@rabbit-serveur01-rmq
+	#srv03: sudo rabbitmqctl join_cluster rmqmaster@rabbit-serveur01-rmq
+	
+	sudo rabbitmqctl start_app
+	rabbitmqctl cluster_status
+	rabbitmqctl set_policy ha-all "" '{"ha-mode":"all","ha-sync-mode":"automatic"}'
+	
 Cluster:
 
 Server	Hostname	IP Address
@@ -58,13 +65,12 @@ MQ Server 1	rabbit-ea04-rmq.	10.XXX
 MQ Server 2	rabbit-ea05-rmq.	10.XXX
 MQ Server 3	rabbit-ea06-rmq.	10.XXX
 
-
+Info: copier la clé depuis le master vers slave	
 sudo scp /var/lib/rabbitmq/.erlang.cookie clasyn-ea05-rmq:/var/lib/rabbitmq/.erlang.cookie
 
 
 Service: 
 systemctl status  rabbitmq-server.service
-
 
 	• sudo systemctl restart rabbitmq-server
 
