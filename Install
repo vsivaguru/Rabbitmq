@@ -3,91 +3,76 @@ Forum install:
 https://computingforgeeks.com/how-to-install-latest-rabbitmq-server-on-ubuntu-18-04-lts/
 https://www.flux7.com/tutorial/rabbitmq-tutorial-creating-highly-available-message-queues-using-rabbitmq/
 https://www.flux7.com/tutorial/rabbitmq-tutorial-creating-highly-available-message-queues-using-rabbitmq/
-
 https://ypereirareis.github.io/blog/2017/04/03/rabbitmq-high-available-cluster-haproxy-docker/
-https://www.howtoforge.com/tutorial/how-to-set-up-rabbitmq-cluster-on-ubuntu-1804-lts/
+Best url: https://www.howtoforge.com/tutorial/how-to-set-up-rabbitmq-cluster-on-ubuntu-1804-lts/
 
 Download Erlang:
 
 	https://www.erlang-solutions.com/resources/download.html
 
-Install:
-
+Step.1:Install:
 	wget -O- https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc | sudo apt-key add -
-	wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add -
-	
-	echo "deb https://dl.bintray.com/rabbitmq/debian $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/rabbitmq.list
-	
+	wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add -	
+	echo "deb https://dl.bintray.com/rabbitmq/debian $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/rabbitmq.list	
 	sudo apt update
 	sudo apt -y install rabbitmq-server
 	
-Error: 
-Depends: erlang-mnesia (>= 1:21.3) but 1:18.3-dfsg-1ubuntu3.1 is to be installed or
+If you have some Error: 
+	Depends: erlang-mnesia (>= 1:21.3) but 1:18.3-dfsg-1ubuntu3.1 is to be installed or
                             esl-erlang (>= 1:21.3) but it is not installable
-
 	sudo rm /etc/apt/sources.list.d/rabbitmq.list
 	wget https://www.rabbitmq.com/rabbitmq-signing-key-public.asc
 	
 Error: (ajouter le dépôt manuellement)
-
 	• vim etc/apt/sources.list.d/bintray.rabbitmq.list
 		deb https://dl.bintray.com/rabbitmq-erlang/debian xenial erlang-21.x
-	
-	systemctl status  rabbitmq-server.service
+	• systemctl status  rabbitmq-server.service
 	
 #You can confirm if the service is configured to start on boot using the command:
+	• systemctl is-enabled rabbitmq-server.service
+	• rabbitmq-plugins enable rabbitmq_management
+	• ss -tunelp | grep 15672
 	
-	systemctl is-enabled rabbitmq-server.service
-	
-	rabbitmq-plugins enable rabbitmq_management
-	
-	ss -tunelp | grep 15672
-	
-	rabbitmqctl add_user admin StrongPassword
-	
-	rabbitmqctl set_user_tags admin administrator
-	
-	
+Step.2: Set the role and password for dashboard:
+	• rabbitmqctl add_user admin StrongPassword
+	• rabbitmqctl set_user_tags admin administrator
+		
 check: http://IP:15672
 
-Join cluster (lancer ce commande depuis le slave):
-	#srv02: sudo rabbitmqctl join_cluster rmqmaster@rabbit-serveur01-rmq
-	#srv03: sudo rabbitmqctl join_cluster rmqmaster@rabbit-serveur01-rmq
+Step.3:Join cluster (lancer ces commandes depuis le slave):
+	Info: copier la clé depuis le master vers slave	
+	sudo scp /var/lib/rabbitmq/.erlang.cookie clasyn-ea05-rmq:/var/lib/rabbitmq/.erlang.cookie
 	
-	sudo rabbitmqctl start_app
-	rabbitmqctl cluster_status
-	rabbitmqctl set_policy ha-all "" '{"ha-mode":"all","ha-sync-mode":"automatic"}'
+	• sudo systemctl restart rabbitmq-server
+	• sudo rabbitmqctl stop_app
+
+	• srv02: sudo rabbitmqctl join_cluster rmqmaster@rabbit-serveur01-rmq
+	• srv03: sudo rabbitmqctl join_cluster rmqmaster@rabbit-serveur01-rmq
 	
-Cluster:
+	• sudo rabbitmqctl start_app
+	• rabbitmqctl cluster_status
+
+Step.4: Set the HA Policy
+	The following command will sync all the queues across all nodes:
+	• rabbitmqctl set_policy ha-all "" '{"ha-mode":"all","ha-sync-mode":"automatic"}'
+	
+Cluster status:
 
 Server	Hostname	IP Address
 MQ Server 1	rabbit-ea04-rmq.	10.XXX
 MQ Server 2	rabbit-ea05-rmq.	10.XXX
 MQ Server 3	rabbit-ea06-rmq.	10.XXX
 
-Info: copier la clé depuis le master vers slave	
-sudo scp /var/lib/rabbitmq/.erlang.cookie clasyn-ea05-rmq:/var/lib/rabbitmq/.erlang.cookie
 
-
-Service: 
-systemctl status  rabbitmq-server.service
-
-	• sudo systemctl restart rabbitmq-server
-
-	• sudo rabbitmqctl stop_app
-
-	• sudo rabbitmqctl reset
-
-By default, the cluster stores messages on the disk. You can also choose to store Queues in Memory.
-You can have a node as a RAM node while attaching it to the cluster:
-
+Bonus:
+	By default, the cluster stores messages on the disk. You can also choose to store Queues in Memory.
+	You can have a node as a RAM node while attaching it to the cluster:
 	• rabbitmqctl join_cluster --ram rabbit@clasyn-ea04-rmq
-
 	• sudo rabbitmqctl start_app
-
 	• rabbitmqctl cluster_status
 
-4. Set the HA Policy
-The following command will sync all the queues across all nodes:
-
-rabbitmqctl set_policy ha-all "" '{"ha-mode":"all","ha-sync-mode":"automatic"}'
+Commandes for rabbit-service: 
+	• systemctl status  rabbitmq-server.service
+	• sudo systemctl restart rabbitmq-server
+	• sudo rabbitmqctl stop_app
+	• sudo rabbitmqctl reset
