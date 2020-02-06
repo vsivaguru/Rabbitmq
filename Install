@@ -10,7 +10,7 @@ Download Erlang:
 
 	https://www.erlang-solutions.com/resources/download.html
 
-Step.1:Install:
+Step.1:Install: (use this steps in all serveurs master & slaves)
 	wget -O- https://dl.bintray.com/rabbitmq/Keys/rabbitmq-release-signing-key.asc | sudo apt-key add -
 	wget -O- https://www.rabbitmq.com/rabbitmq-release-signing-key.asc | sudo apt-key add -	
 	echo "deb https://dl.bintray.com/rabbitmq/debian $(lsb_release -sc) main" | sudo tee /etc/apt/sources.list.d/rabbitmq.list	
@@ -39,9 +39,11 @@ Step.2: Set the role and password for dashboard:
 		
 check: http://IP:15672
 
-Step.3:Join cluster (lancer ces commandes depuis le slave):
+Step.3:Join cluster (use this steps in only slaves):
 	Info: copier la clé depuis le master vers slave	
-	sudo scp /var/lib/rabbitmq/.erlang.cookie clasyn-ea05-rmq:/var/lib/rabbitmq/.erlang.cookie
+	(since master:)
+	scp /var/lib/rabbitmq/.erlang.cookie root@srv02:/var/lib/rabbitmq/
+	scp /var/lib/rabbitmq/.erlang.cookie root@srv03:/var/lib/rabbitmq/
 	
 	• sudo systemctl restart rabbitmq-server
 	• sudo rabbitmqctl stop_app
